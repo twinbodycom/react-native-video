@@ -17,7 +17,9 @@ import com.google.android.exoplayer2.util.Util;
 import okhttp3.Cookie;
 import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import java.util.Map;
+import java.util.Arrays;
 
 
 public class DataSourceUtil {

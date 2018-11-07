@@ -22,6 +22,8 @@ import java.util.Map;
 
 public class DataSourceUtil {
 
+    private static OkHttpClient client;
+
     private DataSourceUtil() {
     }
 
@@ -73,8 +75,13 @@ public class DataSourceUtil {
     }
 
     private static HttpDataSource.Factory buildHttpDataSourceFactory(ReactContext context, DefaultBandwidthMeter bandwidthMeter, Map<String, String> requestHeaders) {
-        OkHttpClient.Builder builder = OkHttpClientProvider.createClientBuilder().protocols(Arrays.asList(Protocol.HTTP_1_1));
-        OkHttpClient client = builder.build();
+        if (client == null) {
+            OkHttpClient sharedClient = OkHttpClientProvider.getOkHttpClient();
+            if (sharedClient.protocols().contains(Protocol.HTTP_2)) {
+                sharedClient = sharedClient.newBuilder().protocols(Arrays.asList(Protocol.HTTP_1_1)).build();
+            }
+            client = sharedClient;
+        }
         CookieJarContainer container = (CookieJarContainer) client.cookieJar();
         ForwardingCookieHandler handler = new ForwardingCookieHandler(context);
         container.setCookieJar(new JavaNetCookieJar(handler));
